@@ -1,19 +1,20 @@
 import React, {useState} from "react";
-import { Link } from "react-router-dom";
+import { Redirect } from "react-router-dom";
 import Layout from "../core/Layout";
-import { signin } from "../auth";
+import { signin, authenticate } from "../auth";
 
 const Signin = () => {
 
     const [values, setValues] = useState({
-        email: '',
-        password: '',
+        email: 'test@test.com',
+        password: '123andrea',
         error: '',
-        loading: false
+        loading: false,
+        redirectToReferrer: false
     })
 
     // destructuring values in the state
-    const {name, email, password, success, error} = values
+    const {email, password, loading, error, redirectToReferrer} = values
 
     const handleChange = name => event => {
         setValues({...values, error: false, [name]: event.target.value})
@@ -21,13 +22,15 @@ const Signin = () => {
 
     const clickSubmit = (event) => {
         event.preventDefault()
-        setValues({...values, error: false})
+        setValues({...values, error: false, loading: true})
         signin({email, password})
             .then(data => {
                 if(data.error){
-                    setValues({...values, error: data.error, success: false})
+                    setValues({...values, error: data.error, loading: false})
                 } else {
-                    setValues({...values, name: '', email: '', password: '', error: '', success: true})
+                    authenticate(data, () => {
+                        setValues({...values, redirectToReferrer: true})
+                    })
                 }
             })
     }
@@ -64,21 +67,30 @@ const Signin = () => {
         </div>
     )
 
-    const showSuccess = () => (
-        <div className="alert alert-success" style={{display: success ? '' : 'none'}}>
-            New account is created. Please <Link to="/signin">sign in.</Link>
-        </div>
+    const showLoading = () => (
+        loading && (
+            <div className="alert alert-info">
+                <h2>Loading...</h2>
+            </div>
+        )
     )
+
+    const redirectUser = () => {
+        if(redirectToReferrer){
+            return <Redirect to="/" />
+        }
+    }
 
     return (
         <Layout
-        title="Sign up"
-        description="Please sign up into your account."
+        title="Sign in"
+        description="Please sign in into your account."
         className="container col-md-8 offset-md-2"
         >
-           {showSuccess()}
+           {showLoading()}
            {showError()}
            {signUpForm()}
+           {redirectUser()}
         </Layout>
     )
 }
