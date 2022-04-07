@@ -43,3 +43,35 @@ export const authenticate = (data, next) => {
         next()
     }
 }
+
+
+export const signout = (next) => {
+    if(typeof window !== 'undefined'){
+        // remove user data from localStorage
+        localStorage.removeItem('jwt')
+        // execute callback
+        next()
+        // log out user from backend
+        return fetch(`${API}/signout`, {
+            method: 'GET'
+        })
+        .then(response => {
+            console.log('signout', response)
+        })
+        .catch(err => console.log(err))
+    }
+}
+
+
+export const isAuthenticated = () => {
+    if(typeof window == 'undefined') {
+        return false
+    }
+
+    if(localStorage.getItem('jwt')){
+        // convert string to JSON
+        return JSON.parse(localStorage.getItem('jwt'))
+    } else {
+        return false
+    }
+}
