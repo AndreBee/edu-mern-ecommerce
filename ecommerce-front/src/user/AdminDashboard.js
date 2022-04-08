@@ -4,27 +4,27 @@ import { isAuthenticated } from "../auth";
 import { Link } from "react-router-dom";
 
 
-const Dashboard = () => {
+const AdminDashboard = () => {
     // destructuring the user object
     const {user: {name, email, role}} = isAuthenticated()
 
-    const userLinks = () => {
+    const adminLinks = () => {
         return (
             <div className="card">
-                <h4 className="card-header">User links</h4>
+                <h4 className="card-header">Admin links</h4>
                 <ul className="list-group">
                     <li className="list-group-item">
-                        <Link className="nav-link" to="/cart">My Cart</Link>
+                        <Link className="nav-link" to="/create/category">Create Category</Link>
                     </li>
                     <li className="list-group-item">
-                        <Link className="nav-link" to="/profile/update">Update profile</Link>  
+                        <Link className="nav-link" to="/create/product">Create Product</Link>  
                     </li>
                 </ul>
             </div>
         )
     }
 
-    const userInfo = () => {
+    const adminInfo = () => {
         return (
             <div className="card mb-5">
                 <h3 className="card-header">User Information</h3>
@@ -37,17 +37,6 @@ const Dashboard = () => {
         )
     }
 
-    const purchaseHistory = () => {
-        return (
-            <div className="card mb-5">
-                <h3 className="card-header">Purchase History</h3>
-                <ul className="list-group">
-                    <li className="list-group-item">Item 1</li>
-                </ul>
-             </div>
-        )
-    }
- 
     return (
         <Layout
             title="Dashboard"
@@ -57,11 +46,10 @@ const Dashboard = () => {
             
         <div className="row">
             <div className="col-3">
-                {userLinks()}
+                {adminLinks()}
             </div>
             <div className="col-9">
-                {userInfo()}
-                {purchaseHistory()}
+                {adminInfo()}
             </div>
         </div>
         </Layout>
@@ -69,4 +57,4 @@ const Dashboard = () => {
 }
 
 
-export default Dashboard
+export default AdminDashboard
