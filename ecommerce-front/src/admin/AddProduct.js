@@ -3,6 +3,7 @@ import Layout from "../core/Layout";
 import { isAuthenticated } from "../auth";
 import { Link } from "react-router-dom";
 import { createProduct } from "./apiAdmin";
+import { getCategories } from "./apiAdmin";
 
 
 const AddProduct = () => {
@@ -25,6 +26,18 @@ const AddProduct = () => {
         formData: ''
     })
 
+    // load categories and set form data
+    const init = () => {
+        getCategories().then(data => {
+            if(data.error){
+                setValues({...values, error: data.error})
+            } else {
+                setValues({...values, categories: data, formData: new FormData()})
+            }
+        })
+    }
+
+
     // destructure values from state to use for the form creation
     const {
         name,
@@ -44,7 +57,7 @@ const AddProduct = () => {
     // using form data API which is available
     // in the browser when the component mounts
     useEffect(() => {
-        setValues({...values, formData: new FormData()})
+        init()
     }, [])
 
     // higher-order function: func returning another func
@@ -114,7 +127,10 @@ const AddProduct = () => {
                     onChange={handleChange('category')} 
                     className="form-control"
                 >
-                    <option value='hardCodedIdTest'>Python</option>
+                    <option>Please select</option>
+                    {categories && categories.map((cat, index) => (
+                        <option key={index} value={cat._id}>{cat.name}</option>
+                    ))}
                 </select>
             </div>
 
@@ -129,6 +145,7 @@ const AddProduct = () => {
                     onChange={handleChange('shipping')} 
                     className="form-control"
                 >
+                    <option>Please select</option>
                     <option value='0'>No</option>
                     <option value='1'>Yes</option>
                 </select>
@@ -139,6 +156,28 @@ const AddProduct = () => {
     )
 
 
+    const showError = () => (
+        // make it visible only if there is error
+        <div className="alert alert-danger" style={{display: error ? '' : 'none'}}>
+            {error}
+        </div>
+    )
+
+    const showSuccess = () => (
+        // make it visible only if there is error
+        <div className="alert alert-info" style={{display: createdProduct ? '' : 'none'}}>
+            <h2>{`${createdProduct}`} is created!</h2>
+        </div>
+    )
+
+    const showLoading = () => (
+        loading && (
+            <div className="alert alert-success">
+                <h2>Loading...</h2>
+            </div>
+        )
+    )
+
     return (
         <Layout
             title="Add a new Product"
@@ -147,6 +186,9 @@ const AddProduct = () => {
             
         <div className="row">
             <div className="col-md-8 offset-md-2">
+                {showLoading()}
+                {showSuccess()}
+                {showError()}
                 {newPostForm()}
             </div>
         </div>
