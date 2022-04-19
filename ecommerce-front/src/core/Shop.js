@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import Card from "./Card";
 import { getCategories } from "./apiCore";
 import Checkbox from "./Checkbox";
+import RadioBox from "./RadioBox";
+import { prices } from "./FixedPrices";
 
 
 const Shop  = () => {
@@ -36,7 +38,23 @@ const Shop  = () => {
         // update filter state with cat or price
         const newFilters = {...myFilters}
         newFilters.filters[filterBy] = filters
+
+        if(filterBy === 'price'){
+            let priceValues = handlePrice(filters)
+            newFilters.filters[filterBy] = priceValues
+        }
         setMyFilters(newFilters)
+    }
+
+    const handlePrice = value => {
+        const data = prices
+        let array = []
+        for(let key in data){
+            if(data[key]._id === parseInt(value)){
+                array = data[key].array
+            }
+        }
+        return array
     }
 
     return (
@@ -54,6 +72,14 @@ const Shop  = () => {
                             handleFilters={filters => handleFilters(filters, 'category')}
                         />
                     </ul>
+
+                    <h4>Filter by Price Range</h4>
+                    <div>
+                        <RadioBox 
+                            prices={prices}
+                            handleFilters={filters => handleFilters(filters, 'price')}
+                        />
+                    </div>
                 </div>
                 <div className="col-8">
                     {JSON.stringify(myFilters)}
