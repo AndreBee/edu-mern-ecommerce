@@ -3,7 +3,7 @@ import Layout from "./Layout";
 import { getProducts } from "./apiCore";
 import { useEffect, useState } from "react";
 import Card from "./Card";
-
+import Search from "./Search";
 
 const Home = () => {
 
@@ -47,6 +47,7 @@ const Home = () => {
             description="Node React Ecomerce App"
             className="container-fluid"
         >
+            <Search/>
             <h2 className="mb-4">New Arrivals</h2>
             <div className="row">
                 {productsByArrival.map((product, index) => (
