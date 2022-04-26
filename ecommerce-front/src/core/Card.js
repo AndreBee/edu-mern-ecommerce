@@ -1,9 +1,23 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import ShowImage from "./ShowImage";
-import moment from 'moment'
+import moment, { updateLocale } from 'moment'
+import { addItem } from "./cartHelpers";
+import { Redirect } from "react-router-dom";
+import { updateItem } from "./cartHelpers";
+import { removeItem } from "./cartHelpers";
 
-const Card = ({product, showViewProductButton = true}) => {
+
+const Card = ({
+    product, 
+    showViewProductButton = true, 
+    showAddToCartBtn = true, 
+    cardUpdate = false,
+    showRemoveProductBtn = false,       
+}) => {
+
+    const [redirect, setRedirect] = useState(false)
+    const [count, setCount] = useState(product.count)
 
     const showViewButton = (showViewProductButton) => {
         return (
@@ -16,12 +30,40 @@ const Card = ({product, showViewProductButton = true}) => {
             )
         )
     }
+
+    const addToCart = () => {
+        addItem(product, () => {
+            setRedirect(true)
+        })
+    }
+
+    const shouldRedirect = redirect => {
+        if(redirect){
+            return <Redirect to="/cart" />
+        }
+    }
   
-    const showAddToCartButton = () => {
-        return (
+    const showAddToCart = (showAddToCartBtn) => {
+        return showAddToCartBtn && (
             <Link to="/">
-                <button className="btn btn-outline-warning mt-2 mb-2">
+                <button 
+                    onClick={addToCart}
+                    className="btn btn-outline-warning mt-2 mb-2"
+                >
                     Add to cart
+                </button>
+            </Link>
+        )
+    }
+
+    const showRemoveBtn = showRemoveProductBtn => {
+        return showRemoveProductBtn && (
+            <Link to="/">
+                <button 
+                    onClick={() => removeItem(product._id)}
+                    className="btn btn-outline-danger mt-2 mb-2"
+                >
+                    Remove product
                 </button>
             </Link>
         )
@@ -35,12 +77,38 @@ const Card = ({product, showViewProductButton = true}) => {
         )
     }
 
+    const handleChange = productId => event => {
+        setCount(event.target.value < 1 ? 1 : event.target.value)
+        if(event.target.value >= 1){
+            updateItem(productId, event.target.value)
+        }
+    }
+
+    const showCartUpdateOptions = cardUpdate => {
+        return cardUpdate && <div>
+            <div className="input-group mb-3">
+                <div className="input-group-prepend">
+                    <span className="input-group-text">
+                        Adjust quantity
+                    </span>
+                    <input 
+                        type="number" 
+                        className="form-control" 
+                        value={count}
+                        onChange={handleChange(product._id)}
+                    />
+                </div>
+            </div>
+        </div>
+    }
+
     return (
             <div className="card">
                 <div className="card-header name">
                     {product.name}
                 </div>
                 <div className="card-body">
+                    {shouldRedirect(redirect)}
                     <ShowImage item={product} url="product"/>
                     <p className="lead mt-2">{product.description.substring(0, 100)}</p>
                     <p className="black-10">${product.price}</p>
@@ -51,7 +119,9 @@ const Card = ({product, showViewProductButton = true}) => {
                         {showStock(product.quantity)}
                         <br/>
                         {showViewButton(showViewProductButton)}
-                        {showAddToCartButton()}
+                        {showAddToCart(showAddToCartBtn)}
+                        {showRemoveBtn(showRemoveProductBtn)}
+                        {showCartUpdateOptions(cardUpdate)}
                 </div>
             </div>
     )

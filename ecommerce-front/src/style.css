@@ -81,3 +81,13 @@ Black shades 10-1
 .black-8 {
     background: #d9d9d9;
 }
+
+/**
+    Cart styling
+**/
+
+.cart-badge, .cart-badge:hover {
+    border-radius: 90%;
+    padding: 4px;
+    background: black;
+}
