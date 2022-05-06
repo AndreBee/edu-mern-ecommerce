@@ -10,10 +10,11 @@ import Checkout from "./Checkout";
 
 const Cart = () => {
     const [items, setItems] = useState([])
+    const [run, setRun] = useState(false)
 
     useEffect(() => {
         setItems(getCart())
-    }, [items])
+    }, [run])
 
     const showItems = items => {
         return (
@@ -27,6 +28,8 @@ const Cart = () => {
                         showAddToCartBtn={false}
                         cardUpdate={true}
                         showRemoveProductBtn={true}
+                        setRun={setRun}
+                        run={run}
                     />
                 ))}
             </div>

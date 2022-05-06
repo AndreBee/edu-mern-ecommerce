@@ -13,7 +13,9 @@ const Card = ({
     showViewProductButton = true, 
     showAddToCartBtn = true, 
     cardUpdate = false,
-    showRemoveProductBtn = false,       
+    showRemoveProductBtn = false, 
+    setRun = f => f,
+    run = undefined      
 }) => {
 
     const [redirect, setRedirect] = useState(false)
