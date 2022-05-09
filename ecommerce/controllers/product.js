@@ -7,7 +7,9 @@ const {errorHandler} = require('../helpers/dbErrorHandler')
 
 // middleware for route
 exports.productById = (req, res, next, id) => {
-    Product.findById(id).exec((err, product) => {
+    Product.findById(id)
+    .populate('category')
+    .exec((err, product) => {
         if(err || !product){
             return res.status(400).json({
                 error: "Product not found."
@@ -263,4 +265,31 @@ exports.photo = (req, res, next) => {
     }
 
     next()
+}
+
+
+exports.listSearch = (req, res) => {
+    // create query object to hold search and category value
+    const query = {}
+    // assign search value to query.name
+    if(req.query.search){
+        // $options: 'i' == case insensitive
+        query.name = {$regex: req.query.search, $options: 'i'}
+        // assign category value to query.category
+        if(req.query.category && req.query.category != "All"){
+            query.category = req.query.category
+        }
+
+        // find product based on query obj with 2 properties:
+        // search and category
+        Product.find(query, (err, products) => {
+            if(err){
+                return res.status(400).json({
+                    error: errorHandler(err)
+                })
+            }
+
+            res.json(products)
+        }).select('-photo')
+    }
 }
