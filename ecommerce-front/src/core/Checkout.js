@@ -79,35 +79,41 @@ const Checkout = ({products, setRun = f => f, run = undefined}) => {
             processPayment(userId, token, paymentData)
             .then(response => {
                 console.log(response)
-                setData({...data, success: response.success})
+    
                 // create order
                 const createOrderData = {
-                    procuts: products,
+                    products: products,
                     transaction_id: response.transaction.id,
                     amount: response.transaction.amount,
                     address: data.address
                 }
 
                 createOrder(userId, token, createOrderData)
-                // empty cart
-                emptyCart(() => {
-                    console.log('payment success and empty cart.')
-                    setRun(!run)
-                    setData({loading: false, success: true})
+                .then(response => {
+                    // empty cart
+                    emptyCart(() => {
+                        console.log('payment success and empty cart.')
+                        setRun(!run)
+                        setData({
+                            loading: false, 
+                            success: true
+                        })
+                    })
+                })            
+                .catch(error => {
+                    console.log(error)
+                    setData({loading: false})
                 })
-                
-                
-            })
-            .catch(error => {
-                console.log(error)
-                setData({loading: false})
-            })
-
         })
         .catch(err => {
             //console.log('DropIn error: ', err)
-            setData({...data, error: err.message})
+            setData({loading: false})
         })
+    })
+    .catch(err => {
+        //console.log('DropIn error: ', err)
+        setData({...data, error: err.message})
+    })
     }
 
     const showDropIn = () => (
